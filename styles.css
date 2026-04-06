@@ -2,12 +2,21 @@
   box-sizing: border-box;
 }
 
+:root {
+  /* Paleta TOOLTEK / HEMIC */
+  --azul-oscuro: #25638f;
+  --azul-medio: #0081b0;
+  --azul-claro: #91cade;
+  --rojo-hemic: #e52624;
+  --gris-medio: #767676;
+}
+
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
-  background: radial-gradient(circle at top left, #e0f2fe 0, #f9fafb 40%, #eef2ff 100%);
-  color: #0f172a;
+  background: radial-gradient(circle at top left, var(--azul-claro) 0, #f9fafb 45%, #ffffff 100%);
+  color: var(--gris-medio);
 }
 
 .app {
@@ -27,22 +36,24 @@ body {
 .app-title h1 {
   margin: 0;
   font-size: 1.6rem;
-  color: #0f172a;
+  color: var(--azul-oscuro);
 }
 
 .app-title p {
   margin: 0.25rem 0 0;
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--gris-medio);
 }
 
 .badge {
-  padding: 0.2rem 0.6rem;
+  padding: 0.2rem 0.7rem;
   border-radius: 999px;
   font-size: 0.75rem;
-  background: rgba(37, 99, 235, 0.08);
-  color: #1d4ed8;
-  border: 1px solid rgba(37, 99, 235, 0.18);
+  background: rgba(0, 129, 176, 0.08);
+  color: var(--azul-medio);
+  border: 1px solid rgba(0, 129, 176, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .app-layout {
@@ -68,7 +79,7 @@ section {
 section h2 {
   margin: 0 0 0.75rem;
   font-size: 1.05rem;
-  color: #0f172a;
+  color: var(--azul-oscuro);
 }
 
 section p {
@@ -104,13 +115,13 @@ button {
 input:focus,
 select:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.3);
+  border-color: var(--azul-medio);
+  box-shadow: 0 0 0 1px rgba(0, 129, 176, 0.3);
 }
 
 button {
   cursor: pointer;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: linear-gradient(135deg, var(--azul-medio), var(--azul-oscuro));
   color: #ffffff;
   border: none;
   padding-inline: 0.9rem;
@@ -118,19 +129,19 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  box-shadow: 0 10px 18px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 10px 18px rgba(37, 99, 143, 0.35);
   transition: transform 0.05s ease, box-shadow 0.05s ease, filter 0.1s ease;
 }
 
 button:hover {
   filter: brightness(1.02);
   transform: translateY(-1px);
-  box-shadow: 0 14px 26px rgba(37, 99, 235, 0.5);
+  box-shadow: 0 14px 26px rgba(37, 99, 143, 0.5);
 }
 
 button:active {
   transform: translateY(0);
-  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 8px 16px rgba(37, 99, 143, 0.4);
 }
 
 #movimientos button[type="submit"] {
@@ -169,10 +180,10 @@ button:active {
 }
 
 #inventario th {
-  background: #f3f4f6;
+  background: var(--azul-oscuro);
   font-weight: 600;
   font-size: 0.8rem;
-  color: #4b5563;
+  color: #ffffff;
   position: sticky;
   top: 0;
   z-index: 1;
@@ -183,7 +194,7 @@ button:active {
 }
 
 #inventario tbody tr:hover {
-  background: #eff6ff;
+  background: rgba(145, 202, 222, 0.3);
 }
 
 .mensaje {
@@ -196,11 +207,11 @@ button:active {
 }
 
 .mensaje.error {
-  color: #b91c1c;
+  color: var(--rojo-hemic);
 }
 
 .reponer {
-  color: #b91c1c;
+  color: var(--rojo-hemic);
   font-weight: 600;
 }
 
