@@ -7,12 +7,14 @@ async function cargarInventario() {
 }
 
 async function apiPost(payload) {
+  const params = new URLSearchParams();
+  Object.entries(payload).forEach(([key, value]) => {
+    params.append(key, value);
+  });
+
   const res = await fetch(API_URL, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
+    body: params,
   });
   return res.json();
 }
