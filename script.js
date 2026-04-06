@@ -1,4 +1,4 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbw4NCW8_rQceDX2A-MtC8pUaTAip-VHxF9-97UrOIuE4pJZK43VuWWqLoDSvNpJlg2t/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyDUW1BbZCcHmuRJBrP4JR_jAugAFSsBoh2KTxMR9xKMYhuS9tNkY5ocUolyy3bN6OC/exec';
 
 async function cargarInventario() {
   const res = await fetch(API_URL);
@@ -90,7 +90,13 @@ async function manejarMovimiento(event) {
     mensaje.className = 'mensaje error';
   } else {
     await renderInventario(resp.inventario);
-    mensaje.textContent = `Movimiento de ${tipo} aplicado (x${cantidad}) al código ${codigo}.`;
+
+    if (resp.nuevoArticulo) {
+      mensaje.textContent = `Se creó un nuevo artículo con código ${codigo}. Complete descripción y stock mínimo arriba y guarde el artículo.`;
+    } else {
+      mensaje.textContent = `Movimiento de ${tipo} aplicado (x${cantidad}) al código ${codigo}.`;
+    }
+
     mensaje.className = 'mensaje ok';
   }
 
