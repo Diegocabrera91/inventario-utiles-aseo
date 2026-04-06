@@ -38,7 +38,7 @@
 
         <section id="movimientos">
           <h2>Registrar movimiento con lector de código de barras</h2>
-          <p>Seleccione el tipo de movimiento y la cantidad, coloque el cursor en el campo y pase el código por el lector.</p>
+          <p>Seleccione el tipo de movimiento y la cantidad, coloque el cursor en el campo y pase el código por el lector o use la cámara.</p>
           <form id="formMovimiento">
             <label>Tipo de movimiento
               <select id="tipoMovimiento">
@@ -54,6 +54,12 @@
             </label>
             <button type="submit">Aplicar movimiento</button>
           </form>
+          <div id="scannerWrapper">
+            <button type="button" id="toggleScannerBtn">Usar cámara del teléfono</button>
+            <div id="scannerContainer">
+              <video id="scannerVideo"></video>
+            </div>
+          </div>
           <p id="mensajeMovimiento" class="mensaje"></p>
         </section>
       </div>
@@ -79,6 +85,7 @@
     </main>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

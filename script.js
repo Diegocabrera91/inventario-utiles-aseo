@@ -118,10 +118,94 @@ async function exportarCSV() {
   URL.revokeObjectURL(url);
 }
 
+let scannerActivo = false;
+
+function iniciarEscanerCamara() {
+  const scannerContainer = document.getElementById('scannerContainer');
+  const toggleBtn = document.getElementById('toggleScannerBtn');
+
+  if (scannerActivo) {
+    detenerEscanerCamara();
+    return;
+  }
+
+  if (!window.Quagga) {
+    alert('El escáner de cámara no está disponible.');
+    return;
+  }
+
+  scannerContainer.style.display = 'block';
+  toggleBtn.textContent = 'Detener cámara';
+
+  Quagga.init({
+    inputStream: {
+      type: 'LiveStream',
+      target: scannerContainer,
+      constraints: {
+        facingMode: 'environment',
+      },
+    },
+    decoder: {
+      readers: ['code_128_reader', 'ean_reader', 'ean_8_reader', 'upc_reader'],
+    },
+    locate: true,
+  }, (err) => {
+    if (err) {
+      console.error(err);
+      alert('No se pudo iniciar la cámara.');
+      scannerContainer.style.display = 'none';
+      toggleBtn.textContent = 'Usar cámara del teléfono';
+      scannerActivo = false;
+      return;
+    }
+
+    Quagga.start();
+    scannerActivo = true;
+
+    Quagga.onDetected((result) => {
+      if (!result || !result.codeResult || !result.codeResult.code) return;
+      const codigo = result.codeResult.code;
+      const inputCodigo = document.getElementById('codigoEscaneado');
+      inputCodigo.value = codigo;
+      document.getElementById('mensajeMovimiento').textContent = `Código leído: ${codigo}`;
+      document.getElementById('mensajeMovimiento').className = 'mensaje ok';
+
+      // Aplicar movimiento automáticamente
+      const form = document.getElementById('formMovimiento');
+      form.requestSubmit();
+
+      // Esperar un poco y luego permitir escanear otro
+      setTimeout(() => {
+        document.getElementById('codigoEscaneado').value = '';
+        document.getElementById('codigoEscaneado').focus();
+      }, 500);
+    });
+  });
+}
+
+function detenerEscanerCamara() {
+  const scannerContainer = document.getElementById('scannerContainer');
+  const toggleBtn = document.getElementById('toggleScannerBtn');
+
+  if (scannerActivo && window.Quagga) {
+    Quagga.stop();
+    Quagga.offDetected();
+  }
+
+  scannerContainer.style.display = 'none';
+  toggleBtn.textContent = 'Usar cámara del teléfono';
+  scannerActivo = false;
+}
+
 async function iniciar() {
   document.getElementById('formArticulo').addEventListener('submit', manejarFormularioArticulo);
   document.getElementById('formMovimiento').addEventListener('submit', manejarMovimiento);
   document.getElementById('btnExportar').addEventListener('click', () => { exportarCSV(); });
+
+  const toggleScannerBtn = document.getElementById('toggleScannerBtn');
+  if (toggleScannerBtn) {
+    toggleScannerBtn.addEventListener('click', iniciarEscanerCamara);
+  }
 
   await renderInventario();
 

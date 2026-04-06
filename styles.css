@@ -223,6 +223,38 @@ button:active {
   min-width: 12rem;
 }
 
+/* Escáner con cámara */
+#scannerWrapper {
+  margin-top: 0.75rem;
+}
+
+#scannerContainer {
+  margin-top: 0.5rem;
+  border-radius: 10px;
+  border: 1px dashed rgba(0, 129, 176, 0.5);
+  background: rgba(145, 202, 222, 0.12);
+  overflow: hidden;
+  display: none;
+}
+
+#scannerContainer video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+#toggleScannerBtn {
+  margin-top: 0.5rem;
+  background: linear-gradient(135deg, #ffffff, #f3f4f6);
+  color: var(--azul-oscuro);
+  border: 1px solid rgba(0, 129, 176, 0.35);
+  box-shadow: none;
+}
+
+#toggleScannerBtn:hover {
+  background: #e5f3fb;
+}
+
 @media (max-width: 640px) {
   section {
     padding: 0.9rem 0.9rem 1.1rem;
