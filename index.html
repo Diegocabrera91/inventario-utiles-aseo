@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Inventario de Útiles de Aseo</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h1>Inventario de Útiles de Aseo</h1>
+
+  <section id="registro-articulo">
+    <h2>Registrar / editar artículo</h2>
+    <form id="formArticulo">
+      <label>Código de barras
+        <input type="text" id="codigo" required />
+      </label>
+      <label>Descripción
+        <input type="text" id="descripcion" required />
+      </label>
+      <label>Stock mínimo
+        <input type="number" id="stockMinimo" min="0" value="0" />
+      </label>
+      <label>Stock inicial
+        <input type="number" id="stockInicial" min="0" value="0" />
+      </label>
+      <button type="submit">Guardar artículo</button>
+    </form>
+  </section>
+
+  <section id="movimientos">
+    <h2>Registrar movimiento con lector de código de barras</h2>
+    <p>Seleccione el tipo de movimiento, cantidad, coloque el cursor en el campo y pase el código por el lector.</p>
+    <form id="formMovimiento">
+      <label>Tipo de movimiento
+        <select id="tipoMovimiento">
+          <option value="entrada">Entrada</option>
+          <option value="salida">Salida</option>
+        </select>
+      </label>
+      <label>Cantidad
+        <input type="number" id="cantidadMovimiento" min="1" value="1" />
+      </label>
+      <label>Código escaneado
+        <input type="text" id="codigoEscaneado" autofocus />
+      </label>
+      <button type="submit">Aplicar movimiento</button>
+    </form>
+    <p id="mensajeMovimiento" class="mensaje"></p>
+  </section>
+
+  <section id="inventario">
+    <h2>Inventario actual</h2>
+    <button id="btnExportar">Descargar Excel (CSV)</button>
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Descripción</th>
+          <th>Stock actual</th>
+          <th>Stock mínimo</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody id="tablaInventario"></tbody>
+    </table>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
