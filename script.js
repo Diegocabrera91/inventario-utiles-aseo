@@ -1,20 +1,24 @@
-const STORAGE_KEY = 'inventarioUtilesAseo';
+const API_URL = 'https://script.google.com/macros/s/AKfycbw4NCW8_rQceDX2A-MtC8pUaTAip-VHxF9-97UrOIuE4pJZK43VuWWqLoDSvNpJlg2t/exec';
 
-function cargarInventario() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : [];
+async function cargarInventario() {
+  const res = await fetch(API_URL);
+  const data = await res.json();
+  return data.inventario || [];
 }
 
-function guardarInventario(inventario) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(inventario));
+async function apiPost(payload) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+  return res.json();
 }
 
-function buscarArticulo(inventario, codigo) {
-  return inventario.find((a) => a.codigo === codigo);
-}
-
-function renderInventario() {
-  const inventario = cargarInventario();
+async function renderInventario(inventarioExistente) {
+  const inventario = inventarioExistente || await cargarInventario();
   const cuerpo = document.getElementById('tablaInventario');
   cuerpo.innerHTML = '';
 
@@ -37,7 +41,7 @@ function renderInventario() {
   });
 }
 
-function manejarFormularioArticulo(event) {
+async function manejarFormularioArticulo(event) {
   event.preventDefault();
   const codigo = document.getElementById('codigo').value.trim();
   const descripcion = document.getElementById('descripcion').value.trim();
@@ -46,29 +50,20 @@ function manejarFormularioArticulo(event) {
 
   if (!codigo || !descripcion) return;
 
-  const inventario = cargarInventario();
-  const existente = buscarArticulo(inventario, codigo);
+  await apiPost({
+    accion: 'guardarArticulo',
+    codigo,
+    descripcion,
+    stockMinimo,
+    stockInicial,
+  });
 
-  if (existente) {
-    existente.descripcion = descripcion;
-    existente.stockMinimo = stockMinimo;
-    // No tocamos el stockActual aquí para no sobreescribir movimientos
-  } else {
-    inventario.push({
-      codigo,
-      descripcion,
-      stockMinimo,
-      stockActual: stockInicial,
-    });
-  }
-
-  guardarInventario(inventario);
-  renderInventario();
+  await renderInventario();
   event.target.reset();
   document.getElementById('codigo').focus();
 }
 
-function manejarMovimiento(event) {
+async function manejarMovimiento(event) {
   event.preventDefault();
   const tipo = document.getElementById('tipoMovimiento').value;
   const cantidad = Number(document.getElementById('cantidadMovimiento').value || '1');
@@ -77,25 +72,19 @@ function manejarMovimiento(event) {
 
   if (!codigo || cantidad <= 0) return;
 
-  const inventario = cargarInventario();
-  const articulo = buscarArticulo(inventario, codigo);
+  const resp = await apiPost({
+    accion: 'movimiento',
+    tipo,
+    cantidad,
+    codigo,
+  });
 
-  if (!articulo) {
-    mensaje.textContent = `El código ${codigo} no existe en el inventario. Regístrelo primero en el formulario de arriba.`;
+  if (!resp.ok) {
+    mensaje.textContent = `No se pudo aplicar el movimiento (${resp.mensaje || 'error'}).`;
     mensaje.className = 'mensaje error';
   } else {
-    if (tipo === 'entrada') {
-      articulo.stockActual += cantidad;
-    } else if (tipo === 'salida') {
-      articulo.stockActual -= cantidad;
-      if (articulo.stockActual < 0) {
-        articulo.stockActual = 0;
-      }
-    }
-
-    guardarInventario(inventario);
-    renderInventario();
-    mensaje.textContent = `Movimiento de ${tipo} aplicado a ${articulo.descripcion} (x${cantidad}).`;
+    await renderInventario(resp.inventario);
+    mensaje.textContent = `Movimiento de ${tipo} aplicado (x${cantidad}) al código ${codigo}.`;
     mensaje.className = 'mensaje ok';
   }
 
@@ -103,8 +92,8 @@ function manejarMovimiento(event) {
   document.getElementById('codigoEscaneado').focus();
 }
 
-function exportarCSV() {
-  const inventario = cargarInventario();
+async function exportarCSV() {
+  const inventario = await cargarInventario();
   if (!inventario.length) return;
 
   const encabezados = ['codigo', 'descripcion', 'stock_actual', 'stock_minimo'];
@@ -129,16 +118,16 @@ function exportarCSV() {
   URL.revokeObjectURL(url);
 }
 
-function iniciar() {
+async function iniciar() {
   document.getElementById('formArticulo').addEventListener('submit', manejarFormularioArticulo);
   document.getElementById('formMovimiento').addEventListener('submit', manejarMovimiento);
-  document.getElementById('btnExportar').addEventListener('click', exportarCSV);
+  document.getElementById('btnExportar').addEventListener('click', () => { exportarCSV(); });
 
-  renderInventario();
+  await renderInventario();
 
   // Mantener el foco en el campo de código escaneado para usar el lector como teclado
   const inputEscaneado = document.getElementById('codigoEscaneado');
   window.addEventListener('click', () => inputEscaneado.focus());
 }
 
-window.addEventListener('DOMContentLoaded', iniciar);
+window.addEventListener('DOMContentLoaded', () => { iniciar(); });
