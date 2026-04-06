@@ -70,6 +70,12 @@ async function manejarMovimiento(event) {
   const codigo = document.getElementById('codigoEscaneado').value.trim();
   const mensaje = document.getElementById('mensajeMovimiento');
 
+  // Copiar siempre el código usado al formulario de artículo para facilitar el alta
+  const campoArticuloCodigo = document.getElementById('codigo');
+  if (campoArticuloCodigo) {
+    campoArticuloCodigo.value = codigo;
+  }
+
   if (!codigo || cantidad <= 0) return;
 
   const resp = await apiPost({
@@ -167,6 +173,13 @@ function iniciarEscanerCamara() {
       const codigo = result.codeResult.code;
       const inputCodigo = document.getElementById('codigoEscaneado');
       inputCodigo.value = codigo;
+
+      // Copiar también al formulario de artículo (arriba)
+      const campoArticuloCodigoInner = document.getElementById('codigo');
+      if (campoArticuloCodigoInner) {
+        campoArticuloCodigoInner.value = codigo;
+      }
+
       document.getElementById('mensajeMovimiento').textContent = `Código leído: ${codigo}`;
       document.getElementById('mensajeMovimiento').className = 'mensaje ok';
 
