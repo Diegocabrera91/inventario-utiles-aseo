@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inventario de Útiles de Aseo</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -15,58 +16,180 @@
       <span class="badge">Multiusuario</span>
     </header>
 
+    <!-- DASHBOARD RESUMEN -->
+    <section id="resumenDashboard" class="dashboard">
+      <div class="card-resumen">
+        <span>Total productos</span>
+        <strong id="resumenTotalProductos">0</strong>
+      </div>
+      <div class="card-resumen">
+        <span>Total unidades</span>
+        <strong id="resumenTotalUnidades">0</strong>
+      </div>
+      <div class="card-resumen alerta">
+        <span>Bajo mínimo</span>
+        <strong id="resumenBajoMinimo">0</strong>
+      </div>
+      <div class="card-resumen critico">
+        <span>Sin stock</span>
+        <strong id="resumenSinStock">0</strong>
+      </div>
+    </section>
+
     <main class="app-layout">
       <div>
         <section id="operaciones">
-          <h2>Movimiento (entrada / salida)</h2>
+          <h2>Movimiento (entrada / salida / ajuste)</h2>
 
           <form id="formMovimiento">
             <h3>Datos y movimiento del artículo</h3>
             <p>Indique los datos del artículo y el movimiento. Puede escribir el código o escanearlo con el lector/cámara.</p>
 
-            <label>Código de barras
-              <input type="text" id="codigoEscaneado" autofocus />
-            </label>
-            <label>Descripción
-              <input type="text" id="descripcion" />
-            </label>
-            <label>Stock mínimo
-              <input type="number" id="stockMinimo" min="0" value="0" />
+            <label for="codigoEscaneado">Código de barras
+              <input
+                type="text"
+                id="codigoEscaneado"
+                name="codigoEscaneado"
+                autofocus
+                required
+                autocomplete="off"
+                inputmode="text"
+              />
             </label>
 
-            <label>Tipo de movimiento
-              <select id="tipoMovimiento">
+            <label for="descripcion">Descripción
+              <input
+                type="text"
+                id="descripcion"
+                name="descripcion"
+                required
+                autocomplete="off"
+              />
+            </label>
+
+            <label for="categoria">Categoría
+              <input
+                type="text"
+                id="categoria"
+                name="categoria"
+                placeholder="Ej: baño, limpieza, cocina..."
+                autocomplete="off"
+              />
+            </label>
+
+            <label for="stockMinimo">Stock mínimo
+              <input
+                type="number"
+                id="stockMinimo"
+                name="stockMinimo"
+                min="0"
+                step="1"
+                value="0"
+                required
+              />
+            </label>
+
+            <label for="tipoMovimiento">Tipo de movimiento
+              <select id="tipoMovimiento" name="tipoMovimiento" required>
                 <option value="entrada">Entrada</option>
                 <option value="salida">Salida</option>
+                <option value="ajuste">Ajuste</option>
               </select>
             </label>
-            <label>Cantidad
-              <input type="number" id="cantidadMovimiento" min="1" value="1" />
+
+            <label for="cantidadMovimiento">Cantidad
+              <input
+                type="number"
+                id="cantidadMovimiento"
+                name="cantidadMovimiento"
+                min="1"
+                step="1"
+                value="1"
+                required
+                inputmode="numeric"
+              />
             </label>
 
-            <button type="submit">Aplicar movimiento</button>
+            <label for="responsableMovimiento">Responsable / quien retira o entrega
+              <input
+                type="text"
+                id="responsableMovimiento"
+                name="responsableMovimiento"
+                autocomplete="off"
+              />
+            </label>
+
+            <label for="observacionMovimiento">Observación
+              <textarea
+                id="observacionMovimiento"
+                name="observacionMovimiento"
+                rows="3"
+                placeholder="Ej: reposición mensual, entrega a baño 2, ajuste por conteo físico..."
+              ></textarea>
+            </label>
+
+            <div class="form-actions">
+              <button type="submit">Aplicar movimiento</button>
+              <button type="button" id="btnLimpiarFormulario">Limpiar</button>
+            </div>
           </form>
 
+          <!-- INFO DEL PRODUCTO -->
+          <div id="infoProducto" class="info-producto">
+            <h3>Información del artículo</h3>
+            <p><strong>Estado:</strong> <span id="infoEstadoProducto">Sin seleccionar</span></p>
+            <p><strong>Stock actual:</strong> <span id="infoStockActual">0</span></p>
+            <p><strong>Stock mínimo:</strong> <span id="infoStockMinimo">0</span></p>
+            <p><strong>Último movimiento:</strong> <span id="infoUltimoMovimiento">Sin registros</span></p>
+          </div>
+
+          <!-- ESCÁNER -->
           <div id="scannerWrapper">
             <button type="button" id="toggleScannerBtn">📷 Usar cámara del teléfono</button>
           </div>
-          <p id="mensajeMovimiento" class="mensaje"></p>
+
+          <!-- MENSAJES -->
+          <div id="alertaSistema" class="alerta-sistema" hidden>
+            <strong id="alertaTitulo">Información</strong>
+            <p id="alertaTexto"></p>
+          </div>
+
+          <p id="mensajeMovimiento" class="mensaje" aria-live="polite"></p>
         </section>
       </div>
 
       <section id="inventario">
         <div id="inventario-header">
           <h2>Inventario actual</h2>
-          <button id="btnExportar">Descargar Excel (CSV)</button>
+          <button id="btnExportar" type="button">Descargar Excel (CSV)</button>
         </div>
+
+        <!-- BUSQUEDA Y FILTROS -->
+        <div class="inventario-tools">
+          <input
+            type="text"
+            id="busquedaInventario"
+            placeholder="Buscar por código, descripción o categoría..."
+            autocomplete="off"
+          />
+          <select id="filtroEstado">
+            <option value="todos">Todos</option>
+            <option value="normal">Normal</option>
+            <option value="bajo">Bajo mínimo</option>
+            <option value="agotado">Sin stock</option>
+          </select>
+        </div>
+
         <table>
           <thead>
             <tr>
               <th>Código</th>
               <th>Descripción</th>
+              <th>Categoría</th>
               <th>Stock actual</th>
               <th>Stock mínimo</th>
               <th>Estado</th>
+              <th>Último movimiento</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -74,19 +197,61 @@
         </table>
       </section>
     </main>
+
+    <!-- HISTORIAL -->
+    <section id="historialMovimientos">
+      <div id="historial-header">
+        <h2>Historial de movimientos</h2>
+        <button id="btnExportarHistorial" type="button">Descargar historial</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Código</th>
+            <th>Descripción</th>
+            <th>Movimiento</th>
+            <th>Cantidad</th>
+            <th>Responsable</th>
+            <th>Observación</th>
+          </tr>
+        </thead>
+        <tbody id="tablaHistorial"></tbody>
+      </table>
+    </section>
   </div>
 
-  <!-- Modal flotante de cámara -->
-  <div id="scannerModal" class="scanner-modal" role="dialog" aria-modal="true" aria-label="Escáner de cámara">
+  <!-- MODAL FLOTANTE DE CÁMARA -->
+  <div
+    id="scannerModal"
+    class="scanner-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Escáner de cámara"
+  >
     <div class="scanner-modal-panel">
       <div class="scanner-modal-header">
         <span>📷 Escanear código de barras</span>
-        <button type="button" id="cerrarScannerBtn" class="scanner-close" aria-label="Cerrar escáner">✕</button>
+        <button
+          type="button"
+          id="cerrarScannerBtn"
+          class="scanner-close"
+          aria-label="Cerrar escáner"
+        >
+          ✕
+        </button>
       </div>
+
       <div id="scannerContainer">
         <video id="scannerVideo"></video>
       </div>
-      <p class="scanner-hint">Apunte la cámara al código de barras.<br>El código se leerá automáticamente.</p>
+
+      <p id="scannerEstado" class="scanner-status">Inicializando cámara...</p>
+      <p class="scanner-hint">
+        Apunte la cámara al código de barras.<br />
+        El código se leerá automáticamente.
+      </p>
     </div>
   </div>
 
