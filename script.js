@@ -587,7 +587,7 @@ function abrirScanner() {
   Quagga.init({
     inputStream: {
       type: "LiveStream",
-      target: document.querySelector("#scannerVideo")?.parentElement || document.querySelector("#scannerContainer"),
+      target: target: document.querySelector("#scannerContainer"),
       constraints: {
         facingMode: "environment"
       }
