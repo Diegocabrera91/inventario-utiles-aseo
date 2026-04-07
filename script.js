@@ -117,28 +117,26 @@ async function manejarMovimiento(event) {
       const stockMinimoForm = Number(document.getElementById('stockMinimo').value || '0');
       const stockInicialForm = cantidad;
 
-      if (descripcionForm) {
-        try {
-          const respGuardar = await apiPost({
-            accion: 'guardarArticulo',
-            codigo,
-            descripcion: descripcionForm,
-            stockMinimo: stockMinimoForm,
-            stockInicial: stockInicialForm,
-          });
+      try {
+        const respGuardar = await apiPost({
+          accion: 'guardarArticulo',
+          codigo,
+          descripcion: descripcionForm,
+          stockMinimo: stockMinimoForm,
+          stockInicial: stockInicialForm,
+        });
 
-          if (respGuardar.ok && respGuardar.inventario) {
-            inventarioActual = respGuardar.inventario;
-            mensaje.textContent = `Se creó y guardó el artículo ${codigo} con descripción automáticamente.`;
-          } else {
-            mensaje.textContent = `Se creó el artículo ${codigo}, pero no se pudo guardar la descripción (${respGuardar.mensaje || 'error'}).`;
-          }
-        } catch (e) {
-          console.error(e);
-          mensaje.textContent = `Se creó el artículo ${codigo}, pero falló el guardado automático de la descripción.`;
+        if (respGuardar.ok && respGuardar.inventario) {
+          inventarioActual = respGuardar.inventario;
+          mensaje.textContent = descripcionForm
+            ? `Se creó y guardó el artículo ${codigo} con descripción automáticamente.`
+            : `Se creó el artículo ${codigo} sin descripción. Puede actualizarla luego con el botón Editar.`;
+        } else {
+          mensaje.textContent = `Se creó el artículo ${codigo}, pero no se pudo guardar los datos (${respGuardar.mensaje || 'error'}).`;
         }
-      } else {
-        mensaje.textContent = `Se creó un nuevo artículo con código ${codigo}. Ingrese descripción y stock mínimo y repita el movimiento para guardarlo.`;
+      } catch (e) {
+        console.error(e);
+        mensaje.textContent = `Se creó el artículo ${codigo}, pero falló el guardado automático de los datos.`;
       }
     } else {
       mensaje.textContent = `Movimiento de ${tipo} aplicado (x${cantidad}) al código ${codigo}.`;
@@ -231,11 +229,9 @@ function iniciarEscanerCamara() {
       document.getElementById('mensajeMovimiento').textContent = `Código leído: ${codigo}`;
       document.getElementById('mensajeMovimiento').className = 'mensaje ok';
 
-      // Aplicar movimiento automáticamente
       const form = document.getElementById('formMovimiento');
       form.requestSubmit();
 
-      // Esperar un poco y luego permitir escanear otro
       setTimeout(() => {
         document.getElementById('codigoEscaneado').value = '';
         document.getElementById('codigoEscaneado').focus();
@@ -272,9 +268,17 @@ async function iniciar() {
 
   await renderInventario();
 
-  // Mantener el foco en el campo de código escaneado para usar el lector como teclado
   const inputEscaneado = document.getElementById('codigoEscaneado');
-  window.addEventListener('click', () => inputEscaneado.focus());
+  if (inputEscaneado && formMovimiento) {
+    inputEscaneado.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        formMovimiento.requestSubmit();
+      }
+    });
+  }
+
+  window.addEventListener('click', () => inputEscaneado && inputEscaneado.focus());
 }
 
 window.addEventListener('DOMContentLoaded', () => { iniciar(); });
