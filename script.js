@@ -1,4 +1,4 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbyDUW1BbZCcHmuRJBrP4JR_jAugAFSsBoh2KTxMR9xKMYhuS9tNkY5ocUolyy3bN6OC/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyRgEyrVx9dreA-sIRypubIBMukJEb46JKFB3aOo2ja1SjndzpS9Ge5vLdR8Y7KpAgV/exec';
 
 async function cargarInventario() {
   const res = await fetch(API_URL);
@@ -37,9 +37,58 @@ async function renderInventario(inventarioExistente) {
       <td>${articulo.stockActual}</td>
       <td>${articulo.stockMinimo}</td>
       <td class="${estado === 'Reponer' ? 'reponer' : 'ok'}">${estado}</td>
+      <td>
+        <button type="button" class="btn-editar" data-codigo="${articulo.codigo}">Editar</button>
+        <button type="button" class="btn-eliminar" data-codigo="${articulo.codigo}">Eliminar</button>
+      </td>
     `;
 
     cuerpo.appendChild(tr);
+  });
+
+  const botonesEditar = cuerpo.querySelectorAll('.btn-editar');
+  botonesEditar.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const codigo = btn.dataset.codigo;
+      const articulo = inventario.find((a) => a.codigo === codigo);
+      if (!articulo) return;
+
+      const codigoInput = document.getElementById('codigo');
+      const descripcionInput = document.getElementById('descripcion');
+      const stockMinimoInput = document.getElementById('stockMinimo');
+      const stockInicialInput = document.getElementById('stockInicial');
+
+      if (codigoInput) codigoInput.value = articulo.codigo;
+      if (descripcionInput) descripcionInput.value = articulo.descripcion;
+      if (stockMinimoInput) stockMinimoInput.value = articulo.stockMinimo ?? 0;
+      if (stockInicialInput) stockInicialInput.value = articulo.stockActual ?? 0;
+
+      if (descripcionInput) descripcionInput.focus();
+    });
+  });
+
+  const botonesEliminar = cuerpo.querySelectorAll('.btn-eliminar');
+  botonesEliminar.forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const codigo = btn.dataset.codigo;
+      if (!confirm(`¿Eliminar el artículo con código ${codigo}?`)) return;
+
+      try {
+        const resp = await apiPost({
+          accion: 'eliminarArticulo',
+          codigo,
+        });
+
+        if (resp.ok) {
+          await renderInventario(resp.inventario);
+        } else {
+          alert(resp.mensaje || 'No se pudo eliminar el artículo.');
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Error al intentar eliminar el artículo.');
+      }
+    });
   });
 }
 
