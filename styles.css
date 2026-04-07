@@ -223,28 +223,12 @@ button:active {
   min-width: 12rem;
 }
 
-/* Escáner con cámara */
+/* Botón cámara */
 #scannerWrapper {
   margin-top: 0.75rem;
 }
 
-#scannerContainer {
-  margin-top: 0.5rem;
-  border-radius: 10px;
-  border: 1px dashed rgba(0, 129, 176, 0.5);
-  background: rgba(145, 202, 222, 0.12);
-  overflow: hidden;
-  display: none;
-}
-
-#scannerContainer video {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
 #toggleScannerBtn {
-  margin-top: 0.5rem;
   background: linear-gradient(135deg, #ffffff, #f3f4f6);
   color: var(--azul-oscuro);
   border: 1px solid rgba(0, 129, 176, 0.35);
@@ -253,6 +237,109 @@ button:active {
 
 #toggleScannerBtn:hover {
   background: #e5f3fb;
+}
+
+/* ── Modal flotante de cámara ── */
+.scanner-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(3px);
+  align-items: center;
+  justify-content: center;
+  animation: fadeInOverlay 0.18s ease;
+}
+
+.scanner-modal.activo {
+  display: flex;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.scanner-modal-panel {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+  width: min(92vw, 420px);
+  overflow: hidden;
+  animation: slideUpPanel 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpPanel {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.scanner-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--azul-oscuro);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.scanner-close {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 1.1rem;
+  box-shadow: none;
+  padding: 0.2rem 0.4rem;
+  border-radius: 5px;
+  transition: background 0.1s;
+  line-height: 1;
+}
+
+.scanner-close:hover {
+  background: rgba(255,255,255,0.18);
+  transform: none;
+  box-shadow: none;
+  filter: none;
+}
+
+#scannerContainer {
+  background: #000;
+  overflow: hidden;
+  display: block;
+  width: 100%;
+  min-height: 220px;
+  position: relative;
+}
+
+#scannerContainer video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* línea guía de escaneo */
+#scannerContainer::after {
+  content: '';
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 50%;
+  height: 2px;
+  background: rgba(229, 38, 36, 0.8);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.scanner-hint {
+  text-align: center;
+  font-size: 0.78rem;
+  color: #6b7280;
+  padding: 0.6rem 1rem 0.85rem;
+  margin: 0;
+  line-height: 1.5;
 }
 
 @media (max-width: 640px) {

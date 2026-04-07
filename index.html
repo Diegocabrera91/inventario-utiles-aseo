@@ -48,10 +48,7 @@
           </form>
 
           <div id="scannerWrapper">
-            <button type="button" id="toggleScannerBtn">Usar cámara del teléfono</button>
-            <div id="scannerContainer">
-              <video id="scannerVideo"></video>
-            </div>
+            <button type="button" id="toggleScannerBtn">📷 Usar cámara del teléfono</button>
           </div>
           <p id="mensajeMovimiento" class="mensaje"></p>
         </section>
@@ -77,6 +74,20 @@
         </table>
       </section>
     </main>
+  </div>
+
+  <!-- Modal flotante de cámara -->
+  <div id="scannerModal" class="scanner-modal" role="dialog" aria-modal="true" aria-label="Escáner de cámara">
+    <div class="scanner-modal-panel">
+      <div class="scanner-modal-header">
+        <span>📷 Escanear código de barras</span>
+        <button type="button" id="cerrarScannerBtn" class="scanner-close" aria-label="Cerrar escáner">✕</button>
+      </div>
+      <div id="scannerContainer">
+        <video id="scannerVideo"></video>
+      </div>
+      <p class="scanner-hint">Apunte la cámara al código de barras.<br>El código se leerá automáticamente.</p>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
