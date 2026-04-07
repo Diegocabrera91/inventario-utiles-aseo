@@ -140,14 +140,41 @@ async function manejarMovimiento(event) {
     mensaje.textContent = `No se pudo aplicar el movimiento (${resp.mensaje || 'error'}).`;
     mensaje.className = 'mensaje error';
   } else {
-    await renderInventario(resp.inventario);
+    let inventarioActual = resp.inventario;
 
     if (resp.nuevoArticulo) {
-      mensaje.textContent = `Se creó un nuevo artículo con código ${codigo}. Complete descripción y stock mínimo arriba y guarde el artículo.`;
+      const descripcionForm = document.getElementById('descripcion').value.trim();
+      const stockMinimoForm = Number(document.getElementById('stockMinimo').value || '0');
+      const stockInicialForm = Number(document.getElementById('stockInicial').value || cantidad);
+
+      if (descripcionForm) {
+        try {
+          const respGuardar = await apiPost({
+            accion: 'guardarArticulo',
+            codigo,
+            descripcion: descripcionForm,
+            stockMinimo: stockMinimoForm,
+            stockInicial: stockInicialForm,
+          });
+
+          if (respGuardar.ok && respGuardar.inventario) {
+            inventarioActual = respGuardar.inventario;
+            mensaje.textContent = `Se creó y guardó el artículo ${codigo} con descripción automáticamente.`;
+          } else {
+            mensaje.textContent = `Se creó el artículo ${codigo}, pero no se pudo guardar la descripción (${respGuardar.mensaje || 'error'}).`;
+          }
+        } catch (e) {
+          console.error(e);
+          mensaje.textContent = `Se creó el artículo ${codigo}, pero falló el guardado automático de la descripción.`;
+        }
+      } else {
+        mensaje.textContent = `Se creó un nuevo artículo con código ${codigo}. Ingrese descripción y stock mínimo arriba y guarde el artículo.`;
+      }
     } else {
       mensaje.textContent = `Movimiento de ${tipo} aplicado (x${cantidad}) al código ${codigo}.`;
     }
 
+    await renderInventario(inventarioActual);
     mensaje.className = 'mensaje ok';
   }
 
