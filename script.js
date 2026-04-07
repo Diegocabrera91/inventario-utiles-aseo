@@ -53,15 +53,13 @@ async function renderInventario(inventarioExistente) {
       const articulo = inventario.find((a) => a.codigo === codigo);
       if (!articulo) return;
 
-      const codigoInput = document.getElementById('codigo');
+      const codigoInput = document.getElementById('codigoEscaneado');
       const descripcionInput = document.getElementById('descripcion');
       const stockMinimoInput = document.getElementById('stockMinimo');
-      const stockInicialInput = document.getElementById('stockInicial');
 
       if (codigoInput) codigoInput.value = articulo.codigo;
       if (descripcionInput) descripcionInput.value = articulo.descripcion;
       if (stockMinimoInput) stockMinimoInput.value = articulo.stockMinimo ?? 0;
-      if (stockInicialInput) stockInicialInput.value = articulo.stockActual ?? 0;
 
       if (descripcionInput) descripcionInput.focus();
     });
@@ -92,40 +90,12 @@ async function renderInventario(inventarioExistente) {
   });
 }
 
-async function manejarFormularioArticulo(event) {
-  event.preventDefault();
-  const codigo = document.getElementById('codigo').value.trim();
-  const descripcion = document.getElementById('descripcion').value.trim();
-  const stockMinimo = Number(document.getElementById('stockMinimo').value || '0');
-  const stockInicial = Number(document.getElementById('stockInicial').value || '0');
-
-  if (!codigo || !descripcion) return;
-
-  await apiPost({
-    accion: 'guardarArticulo',
-    codigo,
-    descripcion,
-    stockMinimo,
-    stockInicial,
-  });
-
-  await renderInventario();
-  event.target.reset();
-  document.getElementById('codigo').focus();
-}
-
 async function manejarMovimiento(event) {
   event.preventDefault();
   const tipo = document.getElementById('tipoMovimiento').value;
   const cantidad = Number(document.getElementById('cantidadMovimiento').value || '1');
   const codigo = document.getElementById('codigoEscaneado').value.trim();
   const mensaje = document.getElementById('mensajeMovimiento');
-
-  // Copiar siempre el código usado al formulario de artículo para facilitar el alta
-  const campoArticuloCodigo = document.getElementById('codigo');
-  if (campoArticuloCodigo) {
-    campoArticuloCodigo.value = codigo;
-  }
 
   if (!codigo || cantidad <= 0) return;
 
@@ -145,7 +115,7 @@ async function manejarMovimiento(event) {
     if (resp.nuevoArticulo) {
       const descripcionForm = document.getElementById('descripcion').value.trim();
       const stockMinimoForm = Number(document.getElementById('stockMinimo').value || '0');
-      const stockInicialForm = Number(document.getElementById('stockInicial').value || cantidad);
+      const stockInicialForm = cantidad;
 
       if (descripcionForm) {
         try {
@@ -168,7 +138,7 @@ async function manejarMovimiento(event) {
           mensaje.textContent = `Se creó el artículo ${codigo}, pero falló el guardado automático de la descripción.`;
         }
       } else {
-        mensaje.textContent = `Se creó un nuevo artículo con código ${codigo}. Ingrese descripción y stock mínimo arriba y guarde el artículo.`;
+        mensaje.textContent = `Se creó un nuevo artículo con código ${codigo}. Ingrese descripción y stock mínimo y repita el movimiento para guardarlo.`;
       }
     } else {
       mensaje.textContent = `Movimiento de ${tipo} aplicado (x${cantidad}) al código ${codigo}.`;
@@ -258,12 +228,6 @@ function iniciarEscanerCamara() {
       const inputCodigo = document.getElementById('codigoEscaneado');
       inputCodigo.value = codigo;
 
-      // Copiar también al formulario de artículo (arriba)
-      const campoArticuloCodigoInner = document.getElementById('codigo');
-      if (campoArticuloCodigoInner) {
-        campoArticuloCodigoInner.value = codigo;
-      }
-
       document.getElementById('mensajeMovimiento').textContent = `Código leído: ${codigo}`;
       document.getElementById('mensajeMovimiento').className = 'mensaje ok';
 
@@ -295,8 +259,10 @@ function detenerEscanerCamara() {
 }
 
 async function iniciar() {
-  document.getElementById('formArticulo').addEventListener('submit', manejarFormularioArticulo);
-  document.getElementById('formMovimiento').addEventListener('submit', manejarMovimiento);
+  const formMovimiento = document.getElementById('formMovimiento');
+  if (formMovimiento) {
+    formMovimiento.addEventListener('submit', manejarMovimiento);
+  }
   document.getElementById('btnExportar').addEventListener('click', () => { exportarCSV(); });
 
   const toggleScannerBtn = document.getElementById('toggleScannerBtn');

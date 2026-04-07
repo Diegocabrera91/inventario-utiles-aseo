@@ -18,30 +18,22 @@
     <main class="app-layout">
       <div>
         <section id="operaciones">
-          <h2>Ingreso, salida y modificación</h2>
+          <h2>Movimiento (entrada / salida)</h2>
 
-          <form id="formArticulo">
-            <h3>Datos del artículo</h3>
+          <form id="formMovimiento">
+            <h3>Datos y movimiento del artículo</h3>
+            <p>Indique los datos del artículo y el movimiento. Puede escribir el código o escanearlo con el lector/cámara.</p>
+
             <label>Código de barras
-              <input type="text" id="codigo" required />
+              <input type="text" id="codigoEscaneado" autofocus />
             </label>
             <label>Descripción
-              <input type="text" id="descripcion" required />
+              <input type="text" id="descripcion" />
             </label>
             <label>Stock mínimo
               <input type="number" id="stockMinimo" min="0" value="0" />
             </label>
-            <label>Stock inicial
-              <input type="number" id="stockInicial" min="0" value="0" />
-            </label>
-            <button type="submit">Guardar artículo</button>
-          </form>
 
-          <hr />
-
-          <form id="formMovimiento">
-            <h3>Movimiento (entrada / salida)</h3>
-            <p>Seleccione el tipo de movimiento y la cantidad, coloque el cursor en el campo y pase el código por el lector o use la cámara.</p>
             <label>Tipo de movimiento
               <select id="tipoMovimiento">
                 <option value="entrada">Entrada</option>
@@ -51,9 +43,7 @@
             <label>Cantidad
               <input type="number" id="cantidadMovimiento" min="1" value="1" />
             </label>
-            <label>Código escaneado
-              <input type="text" id="codigoEscaneado" autofocus />
-            </label>
+
             <button type="submit">Aplicar movimiento</button>
           </form>
 
