@@ -17,9 +17,11 @@
 
     <main class="app-layout">
       <div>
-        <section id="registro-articulo">
-          <h2>Registrar / editar artículo</h2>
+        <section id="operaciones">
+          <h2>Ingreso, salida y modificación</h2>
+
           <form id="formArticulo">
+            <h3>Datos del artículo</h3>
             <label>Código de barras
               <input type="text" id="codigo" required />
             </label>
@@ -34,12 +36,12 @@
             </label>
             <button type="submit">Guardar artículo</button>
           </form>
-        </section>
 
-        <section id="movimientos">
-          <h2>Registrar movimiento con lector de código de barras</h2>
-          <p>Seleccione el tipo de movimiento y la cantidad, coloque el cursor en el campo y pase el código por el lector o use la cámara.</p>
+          <hr />
+
           <form id="formMovimiento">
+            <h3>Movimiento (entrada / salida)</h3>
+            <p>Seleccione el tipo de movimiento y la cantidad, coloque el cursor en el campo y pase el código por el lector o use la cámara.</p>
             <label>Tipo de movimiento
               <select id="tipoMovimiento">
                 <option value="entrada">Entrada</option>
@@ -54,6 +56,7 @@
             </label>
             <button type="submit">Aplicar movimiento</button>
           </form>
+
           <div id="scannerWrapper">
             <button type="button" id="toggleScannerBtn">Usar cámara del teléfono</button>
             <div id="scannerContainer">
