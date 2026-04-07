@@ -226,16 +226,14 @@ function iniciarEscanerCamara() {
       const inputCodigo = document.getElementById('codigoEscaneado');
       inputCodigo.value = codigo;
 
-      document.getElementById('mensajeMovimiento').textContent = `Código leído: ${codigo}`;
-      document.getElementById('mensajeMovimiento').className = 'mensaje ok';
+      const mensaje = document.getElementById('mensajeMovimiento');
+      mensaje.textContent = `Código leído: ${codigo}. Ahora agregue descripción/stock mínimo y luego aplique el movimiento.`;
+      mensaje.className = 'mensaje ok';
 
-      const form = document.getElementById('formMovimiento');
-      form.requestSubmit();
-
-      setTimeout(() => {
-        document.getElementById('codigoEscaneado').value = '';
-        document.getElementById('codigoEscaneado').focus();
-      }, 500);
+      const inputDescripcion = document.getElementById('descripcion');
+      if (inputDescripcion) {
+        inputDescripcion.focus();
+      }
     });
   });
 }
@@ -269,16 +267,9 @@ async function iniciar() {
   await renderInventario();
 
   const inputEscaneado = document.getElementById('codigoEscaneado');
-  if (inputEscaneado && formMovimiento) {
-    inputEscaneado.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        formMovimiento.requestSubmit();
-      }
-    });
+  if (inputEscaneado) {
+    window.addEventListener('click', () => inputEscaneado.focus());
   }
-
-  window.addEventListener('click', () => inputEscaneado && inputEscaneado.focus());
 }
 
 window.addEventListener('DOMContentLoaded', () => { iniciar(); });
