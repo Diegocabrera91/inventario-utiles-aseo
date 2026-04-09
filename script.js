@@ -15,6 +15,7 @@ let historial = [];
 let scannerActivo = false;
 let ultimoCodigoDetectado = null;
 let ultimoScanTs = 0;
+let inventarioCargado = false; // bandera para saber si ya cargó
 
 // ==========================
 // ELEMENTOS
@@ -61,6 +62,14 @@ const scannerModal = document.getElementById("scannerModal");
 const scannerEstado = document.getElementById("scannerEstado");
 
 // ==========================
+// HELPER: buscar producto por código (case-insensitive, sin espacios)
+// ==========================
+function buscarProducto(codigo) {
+  const clave = String(codigo || "").trim().toLowerCase();
+  return inventario.find((item) => item.codigo.toLowerCase() === clave) || null;
+}
+
+// ==========================
 // INIT
 // ==========================
 document.addEventListener("DOMContentLoaded", async () => {
@@ -101,6 +110,7 @@ function prepararEventos() {
 // CARGA DESDE GOOGLE SHEETS
 // ==========================
 async function cargarDatosDesdeSheets() {
+  inventarioCargado = false;
   try {
     mostrarInfo("Cargando datos", "Sincronizando inventario con Google Sheets...");
 
@@ -113,9 +123,10 @@ async function cargarDatosDesdeSheets() {
 
     inventario = (data.inventario || []).map(normalizarProducto);
     historial = (data.historial || []).map(normalizarHistorial);
+    inventarioCargado = true;
 
     renderTodo();
-    mostrarExito("Datos cargados", "Inventario sincronizado correctamente.");
+    mostrarExito("Datos cargados", `Inventario sincronizado: ${inventario.length} producto(s).`);
   } catch (error) {
     console.error(error);
     mostrarError("Error de conexión", error.message || "No se pudo conectar con Google Sheets.");
@@ -154,6 +165,12 @@ function normalizarHistorial(item) {
 async function manejarMovimiento(e) {
   e.preventDefault();
 
+  // Si el inventario aún no ha cargado, avisar y esperar
+  if (!inventarioCargado) {
+    mostrarAdvertencia("Inventario cargando", "Espere a que termine la sincronización antes de registrar movimientos.");
+    return;
+  }
+
   const codigo = limpiarTexto(codigoEscaneado.value);
   const desc = limpiarTexto(descripcion.value);
   const cat = limpiarTexto(categoria.value);
@@ -187,23 +204,30 @@ async function manejarMovimiento(e) {
     return;
   }
 
-  const producto = inventario.find((item) => item.codigo === codigo);
+  // Búsqueda case-insensitive
+  const producto = buscarProducto(codigo);
 
   if (!producto && tipo === "salida") {
-    mostrarError("Producto no existe", "No puede registrar salida de un artículo inexistente.");
+    mostrarError(
+      "Producto no existe",
+      `No se encontró el código "${codigo}" en el inventario. Verifique el código o registre primero una entrada.`
+    );
     return;
   }
 
   if (producto && tipo === "salida" && producto.stockActual < cantidad) {
     mostrarError(
       "Stock insuficiente",
-      `Stock actual: ${producto.stockActual}. No puede sacar ${cantidad}.`
+      `Stock actual: ${producto.stockActual}. No puede retirar ${cantidad} unidades.`
     );
     return;
   }
 
+  // Usar el código exacto como está guardado en el inventario (si existe)
+  const codigoFinal = producto ? producto.codigo : codigo;
+
   const payload = {
-    codigo,
+    codigo: codigoFinal,
     descripcion: desc,
     categoria: cat || "Sin categoría",
     stockMinimo: min,
@@ -257,7 +281,7 @@ function autocompletarDesdeCodigo() {
     return;
   }
 
-  const producto = inventario.find((item) => item.codigo === codigo);
+  const producto = buscarProducto(codigo);
 
   if (producto) {
     descripcion.value = producto.descripcion || "";
@@ -270,7 +294,7 @@ function autocompletarDesdeCodigo() {
 
 function actualizarInfoProducto() {
   const codigo = limpiarTexto(codigoEscaneado.value);
-  const producto = inventario.find((item) => item.codigo === codigo);
+  const producto = buscarProducto(codigo);
 
   if (!codigo) {
     infoEstadoProducto.textContent = "Sin seleccionar";
@@ -281,7 +305,9 @@ function actualizarInfoProducto() {
   }
 
   if (!producto) {
-    infoEstadoProducto.textContent = "Artículo nuevo / no registrado";
+    infoEstadoProducto.textContent = inventarioCargado
+      ? "Artículo nuevo / no registrado"
+      : "Cargando inventario...";
     infoStockActual.textContent = "0";
     infoStockMinimo.textContent = stockMinimo.value || "0";
     infoUltimoMovimiento.textContent = "Sin registros";
@@ -408,7 +434,7 @@ function renderHistorial() {
 // FORMULARIO
 // ==========================
 function cargarProductoEnFormulario(codigo) {
-  const producto = inventario.find((item) => item.codigo === codigo);
+  const producto = buscarProducto(codigo);
   if (!producto) return;
 
   codigoEscaneado.value = producto.codigo;
@@ -558,7 +584,6 @@ function descargarCSV(nombreArchivo, encabezados, filas) {
     )
   ].join("\n");
 
-  // BOM para compatibilidad con Excel en español (tildes y ñ)
   const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
 
@@ -612,7 +637,6 @@ function abrirScanner() {
       return;
     }
 
-    // Registrar listener SOLO después de inicializar correctamente
     Quagga.offDetected(onBarcodeDetected);
     Quagga.onDetected(onBarcodeDetected);
 
