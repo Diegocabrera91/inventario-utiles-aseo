@@ -558,7 +558,8 @@ function descargarCSV(nombreArchivo, encabezados, filas) {
     )
   ].join("\n");
 
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  // BOM para compatibilidad con Excel en español (tildes y ñ)
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
 
   const link = document.createElement("a");
@@ -587,7 +588,7 @@ function abrirScanner() {
   Quagga.init({
     inputStream: {
       type: "LiveStream",
-      target: target: document.querySelector("#scannerContainer"),
+      target: document.querySelector("#scannerContainer"),
       constraints: {
         facingMode: "environment"
       }
@@ -611,13 +612,14 @@ function abrirScanner() {
       return;
     }
 
+    // Registrar listener SOLO después de inicializar correctamente
+    Quagga.offDetected(onBarcodeDetected);
+    Quagga.onDetected(onBarcodeDetected);
+
     Quagga.start();
     scannerActivo = true;
     scannerEstado.textContent = "Cámara activa. Apunte al código.";
   });
-
-  Quagga.offDetected(onBarcodeDetected);
-  Quagga.onDetected(onBarcodeDetected);
 }
 
 function cerrarScanner() {
@@ -625,7 +627,12 @@ function cerrarScanner() {
   scannerEstado.textContent = "Escáner detenido.";
 
   if (window.Quagga && scannerActivo) {
-    Quagga.stop();
+    try {
+      Quagga.offDetected(onBarcodeDetected);
+      Quagga.stop();
+    } catch (e) {
+      console.warn("Error al detener Quagga:", e);
+    }
   }
 
   scannerActivo = false;
