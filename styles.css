@@ -3,7 +3,6 @@
 }
 
 :root {
-  /* Paleta TOOLTEK / HEMIC */
   --azul-oscuro: #25638f;
   --azul-medio: #0081b0;
   --azul-claro: #91cade;
@@ -239,21 +238,21 @@ button:active {
   background: #e5f3fb;
 }
 
-/* ── Modal flotante de cámara ── */
+/* ==========================
+   MODAL FLOTANTE DE CÁMARA
+========================== */
+
 .scanner-modal {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 1000;
-  background: rgba(15, 23, 42, 0.55);
-  backdrop-filter: blur(3px);
-  align-items: center;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(4px);
+  align-items: flex-end;
   justify-content: center;
+  padding: 0;
   animation: fadeInOverlay 0.18s ease;
-}
-
-.scanner-modal.activo {
-  display: flex;
 }
 
 @keyframes fadeInOverlay {
@@ -261,17 +260,36 @@ button:active {
   to   { opacity: 1; }
 }
 
+/* En escritorio: centrado al medio */
+@media (min-width: 641px) {
+  .scanner-modal {
+    align-items: center;
+    padding: 1.5rem;
+  }
+}
+
 .scanner-modal-panel {
   background: #ffffff;
-  border-radius: 14px;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
-  width: min(92vw, 420px);
+  width: 100%;
+  max-width: 480px;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 40px rgba(15, 23, 42, 0.22);
   overflow: hidden;
-  animation: slideUpPanel 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  animation: slideUpPanel 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* En escritorio: panel completamente redondeado */
+@media (min-width: 641px) {
+  .scanner-modal-panel {
+    border-radius: 20px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+  }
 }
 
 @keyframes slideUpPanel {
-  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  from { opacity: 0; transform: translateY(40px) scale(0.98); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
@@ -279,48 +297,72 @@ button:active {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
+  padding: 1rem 1.1rem;
   background: var(--azul-oscuro);
   color: #ffffff;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 700;
 }
 
 .scanner-close {
   background: none;
   border: none;
   color: #ffffff;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   box-shadow: none;
-  padding: 0.2rem 0.4rem;
-  border-radius: 5px;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
   transition: background 0.1s;
   line-height: 1;
+  cursor: pointer;
 }
 
 .scanner-close:hover {
-  background: rgba(255,255,255,0.18);
+  background: rgba(255, 255, 255, 0.18);
   transform: none;
   box-shadow: none;
   filter: none;
 }
 
+/* Contenedor de video */
 #scannerContainer {
-  background: #000;
-  overflow: hidden;
-  display: block;
   width: 100%;
-  min-height: 220px;
+  aspect-ratio: 4 / 3;
+  background: #111827;
   position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* En móvil usa proporción más vertical para aprovechar pantalla */
+@media (max-width: 640px) {
+  #scannerContainer {
+    aspect-ratio: 3 / 4;
+  }
+}
+
+/* Video inyectado por Quagga */
 #scannerContainer video {
-  width: 100%;
-  height: auto;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
   display: block;
+  position: absolute;
+  inset: 0;
 }
 
-/* línea guía de escaneo */
+/* Canvas overlay de Quagga */
+#scannerContainer canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+/* Línea guía de escaneo */
 #scannerContainer::after {
   content: '';
   position: absolute;
@@ -328,19 +370,263 @@ button:active {
   right: 10%;
   top: 50%;
   height: 2px;
-  background: rgba(229, 38, 36, 0.8);
+  background: rgba(229, 38, 36, 0.85);
   border-radius: 2px;
   pointer-events: none;
+  z-index: 10;
+}
+
+.scanner-status {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #374151;
+  padding: 0.6rem 1rem 0;
+  margin: 0;
 }
 
 .scanner-hint {
   text-align: center;
   font-size: 0.78rem;
   color: #6b7280;
-  padding: 0.6rem 1rem 0.85rem;
+  padding: 0.4rem 1rem 1rem;
   margin: 0;
   line-height: 1.5;
 }
+
+/* ==========================
+   DASHBOARD RESUMEN
+========================== */
+
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  background: none;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
+
+@media (max-width: 640px) {
+  .dashboard {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.card-resumen {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.card-resumen span {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.card-resumen strong {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--azul-oscuro);
+  line-height: 1;
+}
+
+.card-resumen.alerta strong {
+  color: #d97706;
+}
+
+.card-resumen.critico strong {
+  color: var(--rojo-hemic);
+}
+
+/* ==========================
+   HISTORIAL
+========================== */
+
+#historialMovimientos {
+  margin-top: 1.5rem;
+  overflow-x: auto;
+}
+
+#historial-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+#historial-header h2 {
+  margin: 0;
+}
+
+#historialMovimientos table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+
+#historialMovimientos th,
+#historialMovimientos td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.45rem 0.35rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+#historialMovimientos th {
+  background: var(--azul-oscuro);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+
+/* ==========================
+   HERRAMIENTAS INVENTARIO
+========================== */
+
+.inventario-tools {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.inventario-tools input {
+  flex: 1;
+  min-width: 140px;
+}
+
+/* ==========================
+   ESTADOS
+========================== */
+
+.estado {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.estado-normal {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.estado-bajo {
+  background: #fef9c3;
+  color: #92400e;
+}
+
+.estado-agotado {
+  background: #fee2e2;
+  color: var(--rojo-hemic);
+}
+
+/* ==========================
+   INFO PRODUCTO
+========================== */
+
+.info-producto {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: #f0f9ff;
+  border: 1px solid rgba(0, 129, 176, 0.2);
+  font-size: 0.83rem;
+}
+
+.info-producto h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.85rem;
+  color: var(--azul-oscuro);
+}
+
+.info-producto p {
+  margin: 0.2rem 0;
+  color: #374151;
+}
+
+/* ==========================
+   ALERTAS DEL SISTEMA
+========================== */
+
+.alerta-sistema {
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  border-left: 4px solid currentColor;
+}
+
+.alerta-sistema strong {
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+.alerta-exito {
+  background: #f0fdf4;
+  color: #15803d;
+  border-color: #16a34a;
+}
+
+.alerta-error {
+  background: #fff1f2;
+  color: #be123c;
+  border-color: var(--rojo-hemic);
+}
+
+.alerta-advertencia {
+  background: #fffbeb;
+  color: #92400e;
+  border-color: #d97706;
+}
+
+.alerta-info {
+  background: #f0f9ff;
+  color: #075985;
+  border-color: var(--azul-medio);
+}
+
+/* ==========================
+   ACCIONES DEL FORMULARIO
+========================== */
+
+.form-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.btn-editar {
+  background: none;
+  border: 1px solid var(--azul-medio);
+  color: var(--azul-medio);
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  box-shadow: none;
+  border-radius: 5px;
+}
+
+.btn-editar:hover {
+  background: #e5f3fb;
+  transform: none;
+  box-shadow: none;
+  filter: none;
+}
+
+/* ==========================
+   RESPONSIVE MÓVIL (< 640px)
+========================== */
 
 @media (max-width: 640px) {
   section {
@@ -364,130 +650,13 @@ button:active {
     width: 100%;
     justify-content: center;
   }
-  /* =========================
-   MODAL ESCÁNER CENTRADO
-========================= */
 
-.scanner-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.75);
-  display: none; /* se activa con JS */
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 9999;
-}
-
-.scanner-modal-panel {
-  width: 100%;
-  max-width: 520px;
-  background: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.scanner-modal-header {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 18px;
-  border-bottom: 1px solid #e5e7eb;
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.scanner-close {
-  border: none;
-  background: transparent;
-  font-size: 22px;
-  cursor: pointer;
-  line-height: 1;
-}
-
-/* =========================
-   CONTENEDOR DE CÁMARA
-========================= */
-
-#scannerContainer {
-  width: 100%;
-  max-width: 420px;
-  aspect-ratio: 4 / 3;
-  margin: 20px auto 10px;
-  border-radius: 18px;
-  overflow: hidden;
-  background: #111827;
-  position: relative;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Video original si aparece */
-#scannerVideo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* Video que inyecta Quagga */
-#scannerContainer video {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover;
-  display: block;
-  border-radius: 18px;
-}
-
-/* Canvas de overlay de Quagga */
-#scannerContainer canvas {
-  position: absolute;
-  inset: 0;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover;
-  border-radius: 18px;
-}
-
-/* =========================
-   TEXTOS DEL MODAL
-========================= */
-
-.scanner-status {
-  margin: 8px 20px 0;
-  font-size: 14px;
-  color: #374151;
-  text-align: center;
-}
-
-.scanner-hint {
-  margin: 8px 20px 20px;
-  font-size: 14px;
-  color: #6b7280;
-  text-align: center;
-  line-height: 1.5;
-}
-
-/* =========================
-   MÓVIL
-========================= */
-
-@media (max-width: 640px) {
-  .scanner-modal-panel {
-    max-width: 100%;
-    border-radius: 18px;
+  .form-actions button {
+    width: auto;
+    flex: 1;
   }
 
-  #scannerContainer {
-    max-width: 100%;
-    aspect-ratio: 3 / 4;
+  .btn-editar {
+    width: auto;
   }
-}
 }
