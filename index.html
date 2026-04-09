@@ -86,6 +86,7 @@
                 step="1"
                 value="0"
                 required
+                inputmode="numeric"
               />
             </label>
 
@@ -180,21 +181,23 @@
           </select>
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Código</th>
-              <th>Descripción</th>
-              <th>Categoría</th>
-              <th>Stock actual</th>
-              <th>Stock mínimo</th>
-              <th>Estado</th>
-              <th>Último movimiento</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="tablaInventario"></tbody>
-        </table>
+        <div class="tabla-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th>Categoría</th>
+                <th>Stock actual</th>
+                <th>Stock mínimo</th>
+                <th>Estado</th>
+                <th>Último movimiento</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaInventario"></tbody>
+          </table>
+        </div>
       </section>
     </main>
 
@@ -205,20 +208,22 @@
         <button id="btnExportarHistorial" type="button">Descargar historial</button>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Código</th>
-            <th>Descripción</th>
-            <th>Movimiento</th>
-            <th>Cantidad</th>
-            <th>Responsable</th>
-            <th>Observación</th>
-          </tr>
-        </thead>
-        <tbody id="tablaHistorial"></tbody>
-      </table>
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Código</th>
+              <th>Descripción</th>
+              <th>Movimiento</th>
+              <th>Cantidad</th>
+              <th>Responsable</th>
+              <th>Observación</th>
+            </tr>
+          </thead>
+          <tbody id="tablaHistorial"></tbody>
+        </table>
+      </div>
     </section>
   </div>
 
